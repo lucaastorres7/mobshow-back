@@ -2,11 +2,16 @@ from contextlib import asynccontextmanager
 import logging
 from fastapi import FastAPI
 
-from log import configure_logging
 from config import settings
 
-configure_logging(settings.log_level)
+from middlewares import logging_middleware
+from routers import health_router
 
+# --- LOGGING ---
+logging.basicConfig(
+  level=settings.log_level.upper(),
+  format="%(asctime)s %(levelname)s %(name)s — %(message)s",
+)
 logger = logging.getLogger(__name__)
 
 # --- LIFECYCLE ---
@@ -22,3 +27,9 @@ app = FastAPI(
   docs_url="/docs",
   lifespan=lifespan
 )
+
+# --- MIDDLEWARES ---
+app.middleware("http")(logging_middleware)
+
+# --- ROUTES ---
+app.include_router(health_router)
