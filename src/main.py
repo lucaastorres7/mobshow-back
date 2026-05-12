@@ -1,13 +1,13 @@
-from contextlib import asynccontextmanager
+# GENERAL LIBS
 import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
+# CUSTOM LIBS
 from config import settings
-
 from middlewares import logging_middleware
-from routers import health_router
-
 from database import redis_client
+from routers import health_router
 
 # --- LOGGING ---
 logging.basicConfig(
