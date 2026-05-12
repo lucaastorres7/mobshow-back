@@ -7,10 +7,12 @@ from config import settings
 from middlewares import logging_middleware
 from routers import health_router
 
+from database import redis_client
+
 # --- LOGGING ---
 logging.basicConfig(
   level=settings.log_level.upper(),
-  format="%(asctime)s %(levelname)s %(name)s — %(message)s",
+  format="[%(asctime)s] - [%(levelname)s] %(name)s — %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -18,7 +20,11 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
   logger.info("Starting Mobshow API...")
+  await redis_client.connect()
+  logger.info("Connected to Redis successfully.")
   yield
+  await redis_client.disconnect()
+  logger.info("Disconnected from Redis successfully.")
   logger.info("Shutting down Mobshow API...")
 
 app = FastAPI(
